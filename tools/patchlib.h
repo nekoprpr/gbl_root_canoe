@@ -122,8 +122,10 @@ INT32 patch_abl_bootstate(CHAR8* buffer, INT32 size,
         if (match) {
             *lock_register_num = (INT8)((UINT8)buffer[i] & 0x1F);
             *offset = i;
+            #ifndef DISABLE_PATCH_3
             for (INT32 j = 0; j < pattern_len; ++j)
                 if (Patched[j] != -1) buffer[i + j] = (char)Patched[j];
+            #endif
             patched_count++;
             i += pattern_len - 1;
         }
@@ -370,14 +372,14 @@ INT32 find_ldrB_instructio_reverse(CHAR8* buffer, INT32 size,
             Print_patcher("  Before: %02X %02X %02X %02X\n",
                    (UINT8)buffer[now_offset], (UINT8)buffer[now_offset+1],
                    (UINT8)buffer[now_offset+2], (UINT8)buffer[now_offset+3]);
-
+            #ifndef DISABLE_PATCH_4
             write_instr(buffer, now_offset, encode_movz_w((UINT8)current_target, 1));
-
             Print_patcher("  After : %02X %02X %02X %02X (MOV W%d, #1)\n",
                    (UINT8)buffer[now_offset], (UINT8)buffer[now_offset+1],
                    (UINT8)buffer[now_offset+2], (UINT8)buffer[now_offset+3],
                    (int)current_target);
-
+            #endif
+            #ifndef DISABLE_PATCH_5
             INT32 fwd = track_forward_patch_strb(buffer, size, now_offset,
                                                   current_target, anchor_offset);
             if (fwd <= 0) {
@@ -385,6 +387,7 @@ INT32 find_ldrB_instructio_reverse(CHAR8* buffer, INT32 size,
                 return -1;
             }
             Print_patcher("Sink patched successfully.\n");
+            #endif
             return 0;
         }
 
@@ -521,9 +524,11 @@ INT32 patch_adrl_unlocked_to_locked_verify(CHAR8* buffer, INT32 size, UINT64 loa
 }
 
 BOOLEAN PatchBuffer(CHAR8* data, INT32 size) {
+    #ifndef DISABLE_PATCH_1
     if (patch_abl_gbl(data, size) != 0)
         Print_patcher("Warning: Failed to patch ABL GBL\n");
-
+    #endif
+    #ifndef DISABLE_PATCH_2
     if (patch_adrl_unlocked_to_locked(data, size, 0) == 0){
         Print_patcher("Warning: ADRL triple not found, skipping\n");
         free(data);
@@ -534,6 +539,7 @@ BOOLEAN PatchBuffer(CHAR8* data, INT32 size) {
         free(data);
         return FALSE;
     }
+    #endif
 
 
     INT32 offset = -1;

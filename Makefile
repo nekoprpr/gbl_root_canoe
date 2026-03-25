@@ -20,7 +20,7 @@ build: patch
   		VERIFIED_BOOT_LE=0 AB_RETRYCOUNT_DISABLE=0 TARGET_BOARD_TYPE_AUTO=0 \
   		BUILD_USES_RECOVERY_AS_BOOT=0 DISABLE_PARALLEL_DOWNLOAD_FLASH=0 PVMFW_BCC_ENABLED=-DPVMFW_BCC\
   		REMOVE_CARVEOUT_REGION=1 QSPA_BOOTCONFIG_ENABLE=1 USER_BUILD_VARIANT=0 \
-  		PREBUILT_HOST_TOOLS="BUILD_CC=clang-20 BUILD_CXX=clang++-20 LDPATH=-fuse-ld=lld-20 BUILD_AR=llvm-ar-20"' || true
+  		PREBUILT_HOST_TOOLS="BUILD_CC=clang BUILD_CXX=clang++ LDPATH=-fuse-ld=lld BUILD_AR=llvm-ar"' || true
 	# test if the build is successful by checking the output file
 	if [ ! -f edk2/Build/RELEASE_CLANG35/AARCH64/LinuxLoader.efi ]; then \
 		echo "Build failed"; \
@@ -40,7 +40,7 @@ build_superfbonly: clean
   		VERIFIED_BOOT_LE=0 AB_RETRYCOUNT_DISABLE=0 TARGET_BOARD_TYPE_AUTO=0 \
   		BUILD_USES_RECOVERY_AS_BOOT=0 DISABLE_PARALLEL_DOWNLOAD_FLASH=0 PVMFW_BCC_ENABLED=-DPVMFW_BCC\
   		REMOVE_CARVEOUT_REGION=1 QSPA_BOOTCONFIG_ENABLE=1 USER_BUILD_VARIANT=0 TEST_ADAPTER=1 \
-  		PREBUILT_HOST_TOOLS="BUILD_CC=clang-20 BUILD_CXX=clang++-20 LDPATH=-fuse-ld=lld-20 BUILD_AR=llvm-ar-20"' || true
+  		PREBUILT_HOST_TOOLS="BUILD_CC=clang BUILD_CXX=clang++ LDPATH=-fuse-ld=lld BUILD_AR=llvm-ar"' || true
 	# test if the build is successful by checking the output file
 	if [ ! -f edk2/Build/RELEASE_CLANG35/AARCH64/LinuxLoader.efi ]; then \
 		echo "Build failed"; \
@@ -56,7 +56,7 @@ build_generic: clean
   		VERIFIED_BOOT_LE=0 AB_RETRYCOUNT_DISABLE=0 TARGET_BOARD_TYPE_AUTO=0 \
   		BUILD_USES_RECOVERY_AS_BOOT=0 DISABLE_PARALLEL_DOWNLOAD_FLASH=0 PVMFW_BCC_ENABLED=-DPVMFW_BCC\
   		REMOVE_CARVEOUT_REGION=1 QSPA_BOOTCONFIG_ENABLE=1 USER_BUILD_VARIANT=0 AUTO_PATCH_ABL=1 DISABLE_PRINT=1\
-  		PREBUILT_HOST_TOOLS="BUILD_CC=clang-20 BUILD_CXX=clang++-20 LDPATH=-fuse-ld=lld-20 BUILD_AR=llvm-ar-20"' || true
+  		PREBUILT_HOST_TOOLS="BUILD_CC=clang BUILD_CXX=clang++ LDPATH=-fuse-ld=lld BUILD_AR=llvm-ar"' || true
 	# test if the build is successful by checking the output file
 	if [ ! -f edk2/Build/RELEASE_CLANG35/AARCH64/LinuxLoader.efi ]; then \
 		echo "Build failed"; \
@@ -76,3 +76,6 @@ test_exploit:
 	@rm ./ABL_original.efi
 test_boot: build
 	fastboot boot ./dist/ABL_with_superfastboot.efi
+
+test:
+	bash ./tests/runall.sh
