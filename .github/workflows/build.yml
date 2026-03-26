@@ -1,0 +1,40 @@
+name: Build ABL Superfastboot
+
+# 触发条件：推送到 main 分支，或者在 Actions 页面手动触发
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: 'recursive' # 非常重要：EDK2 通常包含大量子模块，必须递归拉取
+
+    - name: Install Build Dependencies
+      run: |
+        sudo apt-get update
+        # 安装 Makefile 中提到的 clang, llvm, aarch64 交叉编译链以及 EDK2 常规依赖
+        sudo apt-get install -y build-essential uuid-dev iasl git gcc-aarch64-linux-gnu \
+        python3 python3-pip clang lld llvm xxd zip
+
+    - name: Build Generic Superfastboot
+      run: |
+        # 编译通用版，无需外部 abl.img
+        make build_generic
+
+    - name: Build Superfastboot Only
+      run: |
+        # 编译纯净版
+        make build_superfbonly
+
+    # 将编译产物打包供下载
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ABL_EFI_Binaries
+        path: dist/*.efi
+        if-no-files-found: error
